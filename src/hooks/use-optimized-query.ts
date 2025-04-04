@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 export function useOptimizedQuery<TData, TError = unknown>(
   queryKey: QueryKey,
   queryFn: () => Promise<TData>,
-  options?: UseQueryOptions<TData, TError, TData, QueryKey>
+  options?: Omit<UseQueryOptions<TData, TError, TData, QueryKey>, 'queryKey' | 'queryFn'>
 ) {
   // Extract and format data from the queryKey for prefetch detection
   const queryId = Array.isArray(queryKey) ? 
