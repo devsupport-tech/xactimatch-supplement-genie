@@ -23,11 +23,11 @@ export function useOptimizedQuery<TData, TError = unknown>(
   };
   
   // Use React Query's useQuery with enhanced options
-  const queryResult = useQuery<TData, TError, TData, QueryKey>(
+  const queryResult = useQuery({
     queryKey,
     queryFn,
-    enhancedOptions
-  );
+    ...enhancedOptions
+  });
   
   // Record query access time for optimizing subsequent prefetches
   useEffect(() => {

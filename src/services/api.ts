@@ -8,7 +8,7 @@ const API_BASE_URL = 'https://api.example.com';
 
 // Enhanced cache implementation with TTL and LRU functionality
 class EnhancedCache {
-  private cache: Map<string, { data: any; timestamp: number }>;
+  private cache: Map<string, { data: any; timestamp: number; ttl: number }>;
   private maxSize: number;
   private defaultTTL: number;
 
@@ -24,7 +24,7 @@ class EnhancedCache {
     if (!item) return null;
     
     // Check if the item has expired
-    if (Date.now() - item.timestamp > this.defaultTTL) {
+    if (Date.now() - item.timestamp > item.ttl) {
       this.delete(key);
       return null;
     }
