@@ -41,7 +41,6 @@ function App() {
                 <div className="flex-1 overflow-y-auto">
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
-                    <Route path="/dashboard" element={<Navigate to="/" replace />} />
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/projects/:id" element={<ProjectDetail />} />
                     <Route path="/supplements" element={<Supplements />} />
