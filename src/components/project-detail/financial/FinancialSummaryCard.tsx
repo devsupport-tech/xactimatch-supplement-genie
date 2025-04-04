@@ -36,4 +36,4 @@ const FinancialSummaryCard = ({ project }: FinancialSummaryCardProps) => {
   );
 };
 
-export default FinancialSummaryCard;
+export default React.memo(FinancialSummaryCard);

@@ -17,13 +17,17 @@ import AppSidebar from './components/AppSidebar';
 import { SidebarProvider, SidebarInset } from './components/ui/sidebar';
 import Navbar from './components/Navbar';
 import './App.css';
+import { lazy, Suspense } from 'react';
 
-// Create a client
+// Create a client with optimized configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      retry: 1,
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     },
   },
 });
@@ -52,7 +56,7 @@ function App() {
                     <Route path="/accounting/new-invoice" element={<Accounting />} />
                     <Route path="/accounting/:invoiceId" element={<Accounting />} />
                     <Route path="/contractors" element={<ContractorPortal />} />
-                    <Route path="/contractor-portal" element={<ContractorPortal />} /> {/* Adding an alternative path */}
+                    <Route path="/contractor-portal" element={<ContractorPortal />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/settings/:section" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
