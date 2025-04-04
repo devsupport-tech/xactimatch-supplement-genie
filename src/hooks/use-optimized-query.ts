@@ -16,7 +16,7 @@ export function useOptimizedQuery<TData, TError = unknown>(
     String(queryKey);
   
   // Set default stale time longer than standard React Query to optimize caching
-  const enhancedOptions: UseQueryOptions<TData, TError, TData, QueryKey> = {
+  const enhancedOptions = {
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000,    // 30 minutes
     ...options,
