@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ProjectCardProps } from '@/components/ProjectCard';
 import FinancialFields from './FinancialFields';
@@ -17,6 +17,15 @@ const FinancialSummaryCard = ({ project }: FinancialSummaryCardProps) => {
     handleSave 
   } = useFinancialData(project);
 
+  // Memoize expensive calculations
+  const financialSummary = useMemo(() => {
+    return {
+      originalAmount: project.totalAmount,
+      supplementAmount: totalSupplementAmount,
+      totalAmount: totalWithSupplements
+    };
+  }, [project.totalAmount, totalSupplementAmount, totalWithSupplements]);
+
   return (
     <Card>
       <CardHeader>
@@ -25,15 +34,16 @@ const FinancialSummaryCard = ({ project }: FinancialSummaryCardProps) => {
       <CardContent>
         <div className="space-y-4">
           <FinancialFields 
-            originalAmount={project.totalAmount}
-            supplementAmount={totalSupplementAmount}
+            originalAmount={financialSummary.originalAmount}
+            supplementAmount={financialSummary.supplementAmount}
             onSave={handleSave}
           />
-          <TotalDisplay amount={totalWithSupplements} />
+          <TotalDisplay amount={financialSummary.totalAmount} />
         </div>
       </CardContent>
     </Card>
   );
 };
 
+// Use React.memo to prevent unnecessary re-renders
 export default React.memo(FinancialSummaryCard);
