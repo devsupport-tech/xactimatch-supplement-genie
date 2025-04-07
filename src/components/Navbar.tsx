@@ -13,7 +13,11 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const Navbar = () => {
+interface NavbarProps {
+  title?: string;
+}
+
+const Navbar = ({ title }: NavbarProps) => {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -26,7 +30,7 @@ const Navbar = () => {
         
         {/* Title area - can be customized per page */}
         <div className="flex-1 flex items-center">
-          <span className="font-medium text-lg hidden sm:inline-block">Dashboard</span>
+          {title && <span className="font-medium text-lg hidden sm:inline-block">{title}</span>}
         </div>
         
         {/* Right items */}
