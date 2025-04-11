@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import ProjectAnalytics from '@/components/dashboard/ProjectAnalytics';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { StatCards } from '@/components/dashboard/StatCards';
@@ -18,9 +17,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      
-      <main className="flex-1 container py-6 mt-16 max-w-7xl">
+      <main className="flex-1 container py-6 max-w-7xl">
         {/* Dashboard Header */}
         <DashboardHeader />
         
