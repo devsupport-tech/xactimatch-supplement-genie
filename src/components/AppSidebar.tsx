@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -33,7 +32,15 @@ import { toast } from '@/components/ui/use-toast';
 const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  
+  const displayName = user?.user_metadata?.full_name || user?.email || 'User';
+  const initials = displayName
+    .split(' ')
+    .map(name => name[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
   
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -50,8 +57,8 @@ const AppSidebar = () => {
     return false;
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account",
@@ -107,12 +114,12 @@ const AppSidebar = () => {
         <div className="px-4 py-2">
           <div className="flex items-center gap-2 mb-4">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src={user?.user_metadata?.avatar_url || ""} alt={displayName} />
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">John Doe</span>
-              <span className="text-xs text-muted-foreground">Admin</span>
+              <span className="text-sm font-medium">{displayName}</span>
+              <span className="text-xs text-muted-foreground">{user?.user_metadata?.role || 'User'}</span>
             </div>
           </div>
           

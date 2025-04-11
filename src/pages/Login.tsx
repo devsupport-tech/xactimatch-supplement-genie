@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,13 +8,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/use-toast';
 import { ShieldCheck, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, register, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  // Form state for login and register forms
+  if (isAuthenticated) {
+    navigate('/');
+    return null;
+  }
+  
   const [loginForm, setLoginForm] = useState({ email: '', password: '', rememberMe: false });
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   
@@ -29,40 +34,54 @@ const Login = () => {
     setRegisterForm(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock login - in a real app, you would call an API
-    setTimeout(() => {
+    if (!loginForm.email || !loginForm.password) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+      });
       setIsLoading(false);
+      return;
+    }
+    
+    try {
+      const result = await login(loginForm.email, loginForm.password);
       
-      // Simple validation
-      if (!loginForm.email || !loginForm.password) {
+      if (!result.success) {
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Please fill in all fields",
+          title: "Login failed",
+          description: result.error || "Invalid email or password",
         });
         return;
       }
       
-      // For demo, any login succeeds
-      localStorage.setItem('isAuthenticated', 'true');
       toast({
         title: "Login successful",
         description: "Welcome to ClaimTrak",
       });
       
       navigate('/');
-    }, 1500);
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simple validation
     if (!registerForm.name || !registerForm.email || !registerForm.password || !registerForm.confirmPassword) {
       toast({
         variant: "destructive",
@@ -73,7 +92,6 @@ const Login = () => {
       return;
     }
     
-    // Check if passwords match
     if (registerForm.password !== registerForm.confirmPassword) {
       toast({
         variant: "destructive",
@@ -84,19 +102,34 @@ const Login = () => {
       return;
     }
     
-    // Mock registration
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const result = await register(registerForm.email, registerForm.password, registerForm.name);
       
-      // For demo, any registration succeeds
-      localStorage.setItem('isAuthenticated', 'true');
+      if (!result.success) {
+        toast({
+          variant: "destructive",
+          title: "Registration failed",
+          description: result.error || "Could not create your account",
+        });
+        return;
+      }
+      
       toast({
         title: "Registration successful",
         description: "Your account has been created",
       });
       
       navigate('/');
-    }, 1500);
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const togglePasswordVisibility = () => {
@@ -323,10 +356,22 @@ const Login = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => toast({
+                  description: "Social login will be implemented soon"
+                })}
+              >
                 Google
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => toast({
+                  description: "Social login will be implemented soon"
+                })}
+              >
                 Microsoft
               </Button>
             </div>
