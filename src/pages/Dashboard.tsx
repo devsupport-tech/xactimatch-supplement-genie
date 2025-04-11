@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar title="Dashboard" />
+      <Navbar />
       
       <main className="flex-1 container py-6 mt-16 max-w-7xl">
         {/* Dashboard Header */}
