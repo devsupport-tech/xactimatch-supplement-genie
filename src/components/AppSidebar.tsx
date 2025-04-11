@@ -105,7 +105,12 @@ const AppSidebar = () => {
           </div>
           
           <SidebarMenu>
-            
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => navigate('/settings')}>
+                <Settings className="h-5 w-5" />
+                <span>Settings</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton>
                 <LogOut className="h-5 w-5" />
