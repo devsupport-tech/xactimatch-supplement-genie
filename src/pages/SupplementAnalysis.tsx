@@ -1,10 +1,8 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Clipboard, FileText, Upload } from 'lucide-react';
-import Navbar from '@/components/Navbar';
 import { toast } from '@/components/ui/use-toast';
 import UploadCard from '@/components/UploadCard';
 import ComparisonView from '@/components/ComparisonView';
@@ -98,9 +96,7 @@ const SupplementAnalysis = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-1 container py-8 mt-14">
+      <main className="flex-1 container py-8">
         <div className="flex flex-col gap-6">
           <div>
             <h1 className="text-3xl font-bold">Supplement Analysis</h1>
