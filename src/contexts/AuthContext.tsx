@@ -1,25 +1,13 @@
 
 import { createContext, useState, useContext, useEffect } from 'react';
-import { User, createClient } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-// Check if Supabase credentials are available
-if (!supabaseUrl || !supabaseKey) {
-  console.error(
-    "Supabase credentials missing! Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables are set."
-  );
-}
-
-// Create client only if we have both URL and key
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+import { supabase } from '@/integrations/supabase/client';
 
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
+  session: Session | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
@@ -29,6 +17,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
+  session: null,
   login: async () => ({ success: false }),
   register: async () => ({ success: false }),
   logout: async () => {},
@@ -37,75 +26,47 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   
-  // Check if user is authenticated on mount
+  // Check if user is authenticated on mount and setup auth listener
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // If Supabase is not initialized, set loading to false
-        if (!supabase) {
-          console.error("Supabase client not initialized. Check your environment variables.");
-          setLoading(false);
-          return;
-        }
-        
-        // Get the current session
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("Error fetching session:", error);
-          return;
-        }
-        
-        // Set user and authentication status
-        setUser(data.session?.user || null);
-        setIsAuthenticated(!!data.session);
-      } catch (error) {
-        console.error("Error in auth check:", error);
-      } finally {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log("Auth state changed:", event);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setIsAuthenticated(!!currentSession);
         setLoading(false);
       }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setIsAuthenticated(!!currentSession);
+      setLoading(false);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
     };
-    
-    fetchUser();
-    
-    // Set up auth listener only if Supabase is initialized
-    if (supabase) {
-      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-        console.log("Auth state changed:", event);
-        setUser(session?.user || null);
-        setIsAuthenticated(!!session);
-        setLoading(false);
-      });
-      
-      return () => {
-        // Clean up auth listener on unmount
-        authListener?.subscription.unsubscribe();
-      };
-    }
   }, []);
   
   const login = async (email: string, password: string) => {
     try {
-      if (!supabase) {
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: "Authentication service is not available at the moment.",
-        });
-        return { success: false, error: "Authentication service not available" };
-      }
-      
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
+        console.error("Login error:", error);
         return { success: false, error: error.message };
       }
       
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
       return { success: false, error: "An unexpected error occurred" };
     }
@@ -113,16 +74,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   const register = async (email: string, password: string, name: string) => {
     try {
-      if (!supabase) {
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: "Authentication service is not available at the moment.",
-        });
-        return { success: false, error: "Authentication service not available" };
-      }
-      
-      // Register the user
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -134,17 +85,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       if (error) {
+        console.error("Registration error:", error);
         return { success: false, error: error.message };
       }
       
-      // Update user metadata with name
-      if (data.user) {
-        // Note: signUp already includes user metadata from the options
-        return { success: true };
+      // Check if email confirmation is required
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        return { 
+          success: false, 
+          error: "This email is already registered. Please check your inbox for the confirmation email." 
+        };
       }
       
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
       return { success: false, error: "An unexpected error occurred" };
     }
@@ -152,16 +106,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   const logout = async () => {
     try {
-      if (!supabase) {
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: "Authentication service is not available at the moment.",
-        });
-        return;
-      }
-      
       await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
     } catch (error) {
       console.error("Logout error:", error);
       toast({
@@ -173,7 +122,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
   
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      user, 
+      session,
+      login, 
+      register, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
