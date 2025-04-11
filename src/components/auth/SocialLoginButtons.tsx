@@ -18,7 +18,10 @@ const SocialLoginButtons = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            prompt: 'select_account'
+          }
         }
       });
       
@@ -40,7 +43,7 @@ const SocialLoginButtons = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'azure',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}`
         }
       });
       
