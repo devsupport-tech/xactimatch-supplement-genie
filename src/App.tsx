@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from './components/ui/toaster';
@@ -7,7 +6,7 @@ import AppSidebar from './components/AppSidebar';
 import { SidebarProvider, SidebarInset } from './components/ui/sidebar';
 import Navbar from './components/Navbar';
 import './App.css';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, Outlet } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -64,22 +63,24 @@ function App() {
               } />
               
               {/* Protected routes */}
-              <Route element={<ProtectedRouteLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/projects" element={<Projects />} />
-                <Route path="/projects/:id" element={<ProjectDetail />} />
-                <Route path="/supplements" element={<Supplements />} />
-                <Route path="/supplements/:id" element={<Supplements />} />
-                <Route path="/supplements/status/:status" element={<Supplements />} />
-                <Route path="/supplements/new-request" element={<NewSupplementRequest />} />
-                <Route path="/supplement-analysis" element={<SupplementAnalysis />} />
-                <Route path="/accounting" element={<Accounting />} />
-                <Route path="/accounting/new-invoice" element={<Accounting />} />
-                <Route path="/accounting/:invoiceId" element={<Accounting />} />
-                <Route path="/contractors" element={<ContractorPortal />} />
-                <Route path="/contractor-portal" element={<ContractorPortal />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/settings/:section" element={<Settings />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<ProtectedRouteLayout />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/projects/:id" element={<ProjectDetail />} />
+                  <Route path="/supplements" element={<Supplements />} />
+                  <Route path="/supplements/:id" element={<Supplements />} />
+                  <Route path="/supplements/status/:status" element={<Supplements />} />
+                  <Route path="/supplements/new-request" element={<NewSupplementRequest />} />
+                  <Route path="/supplement-analysis" element={<SupplementAnalysis />} />
+                  <Route path="/accounting" element={<Accounting />} />
+                  <Route path="/accounting/new-invoice" element={<Accounting />} />
+                  <Route path="/accounting/:invoiceId" element={<Accounting />} />
+                  <Route path="/contractors" element={<ContractorPortal />} />
+                  <Route path="/contractor-portal" element={<ContractorPortal />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/:section" element={<Settings />} />
+                </Route>
               </Route>
               
               {/* Not Found */}
@@ -100,37 +101,19 @@ function App() {
 // Component to wrap protected routes with sidebar and navigation
 function ProtectedRouteLayout() {
   return (
-    <ProtectedRoute>
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full">
-          <AppSidebar />
-          <SidebarInset className="flex flex-col">
-            <Navbar />
-            <div className="flex-1 overflow-y-auto">
-              <Suspense fallback={<LoadingFallback />}>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/projects" element={<Projects />} />
-                  <Route path="/projects/:id" element={<ProjectDetail />} />
-                  <Route path="/supplements" element={<Supplements />} />
-                  <Route path="/supplements/:id" element={<Supplements />} />
-                  <Route path="/supplements/status/:status" element={<Supplements />} />
-                  <Route path="/supplements/new-request" element={<NewSupplementRequest />} />
-                  <Route path="/supplement-analysis" element={<SupplementAnalysis />} />
-                  <Route path="/accounting" element={<Accounting />} />
-                  <Route path="/accounting/new-invoice" element={<Accounting />} />
-                  <Route path="/accounting/:invoiceId" element={<Accounting />} />
-                  <Route path="/contractors" element={<ContractorPortal />} />
-                  <Route path="/contractor-portal" element={<ContractorPortal />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/settings/:section" element={<Settings />} />
-                </Routes>
-              </Suspense>
-            </div>
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
-    </ProtectedRoute>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <SidebarInset className="flex flex-col">
+          <Navbar />
+          <div className="flex-1 overflow-y-auto">
+            <Suspense fallback={<LoadingFallback />}>
+              <Outlet />
+            </Suspense>
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
 
