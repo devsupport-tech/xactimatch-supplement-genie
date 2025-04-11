@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, PlusCircle, FileText, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Navbar from '@/components/Navbar';
 import SupplementsList from '@/components/supplements/SupplementsList';
 import SupplementDetail from '@/components/supplements/SupplementDetail';
 import SupplementalForm from '@/components/SupplementalForm';
@@ -189,9 +188,7 @@ const Supplements = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-1 container py-8 mt-14">
+      <main className="flex-1 container py-8">
         <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">

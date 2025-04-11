@@ -2,7 +2,6 @@
 import React from 'react';
 import { useTheme } from '@/hooks/use-theme';
 import { useWorkspace } from '@/hooks/use-workspace';
-import Navbar from '@/components/Navbar';
 import SettingsSidebar from '@/components/settings/SettingsSidebar';
 import WorkspacesSection from '@/components/settings/WorkspacesSection';
 import ProfileSection from '@/components/settings/ProfileSection';
@@ -68,9 +67,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <div className="container mx-auto py-10 px-4 md:px-6 max-w-5xl mt-14">
+      <div className="container mx-auto py-10 px-4 md:px-6 max-w-5xl">
         <h1 className="text-3xl font-bold mb-4">Settings</h1>
         <Separator className="mb-6" />
         

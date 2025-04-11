@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 import SupplementalForm from '@/components/SupplementalForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -25,9 +24,7 @@ const NewSupplementRequest = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-1 container py-8 mt-14">
+      <main className="flex-1 container py-8">
         <div className="mb-6">
           <Button 
             variant="ghost" 
