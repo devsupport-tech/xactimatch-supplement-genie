@@ -27,10 +27,13 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import WorkspaceSwitcher from './workspace/WorkspaceSwitcher';
 import { Separator } from './ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/use-toast';
 
 const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
   
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -45,6 +48,15 @@ const AppSidebar = () => {
     if (path === '/' && location.pathname === '/') return true;
     if (path !== '/' && location.pathname.startsWith(path)) return true;
     return false;
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account",
+    });
+    navigate('/login');
   };
 
   return (
@@ -112,7 +124,7 @@ const AppSidebar = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton>
+              <SidebarMenuButton onClick={handleLogout}>
                 <LogOut className="h-5 w-5" />
                 <span>Sign out</span>
               </SidebarMenuButton>
