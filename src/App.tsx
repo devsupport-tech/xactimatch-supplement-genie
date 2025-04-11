@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from './components/ui/toaster';
 import { ThemeProvider } from './hooks/use-theme';
@@ -6,7 +6,7 @@ import AppSidebar from './components/AppSidebar';
 import { SidebarProvider, SidebarInset } from './components/ui/sidebar';
 import Navbar from './components/Navbar';
 import './App.css';
-import { lazy, Suspense, Outlet } from 'react';
+import { lazy, Suspense } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
